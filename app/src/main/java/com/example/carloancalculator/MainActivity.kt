@@ -1,10 +1,12 @@
 package com.example.carloancalculator
 
+import android.content.Context
 import android.content.res.Configuration
 import android.opengl.GLES11Ext
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.core.os.ConfigurationCompat
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
@@ -15,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        buttonCalculate.setOnClickListener{calculate()}
+        buttonCalculate.setOnClickListener{calculate(it)}
     }
 
 
@@ -31,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         textViewMonthlyRepayment.setText(getString(R.string.monthly_repayment))
     }
 
-    fun calculate(){
+    fun calculate(view: View){
         //todo: get all inputs from user and perform calculation
         if(editTextCarPrice.text.isEmpty()){
             editTextCarPrice.setError(getString(R.string.input_required))
@@ -70,11 +72,15 @@ class MainActivity : AppCompatActivity() {
         var interest = carLoan * loanPeriod * interestRate
         var monthlyRepayment = (carLoan + interest) / loanPeriod / 12
 
-        val currency = Currency.getInstance(resources.configuration.locale)
+        val currency = Currency.getInstance(Locale.getDefault()).getSymbol()
 
         textViewLoan.setText(getString(R.string.loan) + currency + "${carLoan}")
         textViewInterest.setText(getString(R.string.interest) + currency + interest.toString())
         textViewMonthlyRepayment.setText(getString(R.string.monthly_repayment) + currency + monthlyRepayment.toString())
+
+        // Hide the keyboard.
+        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
 }
